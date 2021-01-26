@@ -1,4 +1,31 @@
 {{define "title"}}Books{{end}}
 {{define "body-content"}}
-<p>Charts</p>
+
+<div class="container-md">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col"></th>
+            <th scope="col">Song</th>
+            <th scope="col">Artis</th>
+            <th scope="col">Album</th>
+            <th scope="col">Replays</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range $position, $info := .}}
+        <tr>
+            <th scope="row">{{inc $position}}</th>
+            <th><img src="{{$info.ImageURL}}" class="img-fluid" width="30%" height="30%"></th>
+            <td>{{$info.SongName}}</td>
+            <td>{{$info.ArtistName}}</td>
+            <td>{{$info.AlbumName}}</td>
+            <td>{{$info.TimesListened}}</td>
+        </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+
 {{end}}
