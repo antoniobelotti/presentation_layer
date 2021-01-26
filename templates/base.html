@@ -15,13 +15,22 @@
 <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">AFBD project</a>
+            <a class="navbar-brand" href="/">AFBD project</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link" href="greatest_hits">Greatest hits</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Greatest Hits
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/greatest_hits/today">Today</a></li>
+                            <li><a class="dropdown-item" href="/greatest_hits/last_week">Last week</a></li>
+                            <li><a class="dropdown-item" href="/greatest_hits/last_month">Last month</a></li>
+                        </ul>
+                    </li>
                     <a class="nav-link" href="playlists">Playlists</a>
                 </div>
             </div>
