@@ -9,7 +9,7 @@ import (
 func setUpRoutes() *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/greatest_hits", routes.GreatestHitsHandler)
+	r.HandleFunc("/greatest_hits/{period}", routes.GreatestHitsHandler)
 	r.HandleFunc("/playlists", routes.PlaylistsHandler)
 	r.HandleFunc("/", routes.IndexHandler)
 

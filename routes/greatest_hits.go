@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 	"web/main/models"
@@ -8,7 +9,10 @@ import (
 
 
 func GreatestHitsHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := models.TodayGreatestHits()
+	vars := mux.Vars(r)
+	period := vars["period"]
+
+	rows, err := models.GreatestHits(period)
 	if err != nil {
 		// return error page
 	}

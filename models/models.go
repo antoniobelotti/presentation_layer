@@ -42,9 +42,19 @@ type GreatestHitRow struct {
 	TrackDurationSec int
 }
 
-func TodayGreatestHits() ([]GreatestHitRow, error) {
+func GreatestHits(period string) ([]GreatestHitRow, error) {
+	var dbTable string
+	switch period {
+	case "today":
+		dbTable = "today_gh"
+	case "last_week":
+		dbTable = "last_week_gh"
+	case "last_month":
+		dbTable = "last_month_gh"
+	}
 
-	rows, err := db.Query("SELECT * FROM dbo.today_gh ORDER BY times_listened DESC")
+	sqlQuery := fmt.Sprintf("SELECT * FROM dbo.%s ORDER BY times_listened DESC", dbTable)
+	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
 	}
