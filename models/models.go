@@ -88,3 +88,31 @@ func GreatestHits(period string) ([]GreatestHitRow, error) {
 
 	return chart, nil
 }
+
+
+func GetAllUsernames() ([]string,error) {
+	sqlQuery := fmt.Sprintf("SELECT username FROM [dbo].[users];")
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var usernames []string
+
+	for rows.Next() {
+		var username string
+		err := rows.Scan(&username)
+
+		if err != nil {
+			return nil, err
+		}
+
+		usernames = append(usernames, username)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return usernames,nil
+}
