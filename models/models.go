@@ -116,3 +116,11 @@ func GetAllUsernames() ([]string,error) {
 
 	return usernames,nil
 }
+
+type Playlists struct {
+	Username string
+}
+
+func GetPlaylistsByUsername(username string) (string, error){
+	return "ok",nil
+}

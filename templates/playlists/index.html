@@ -15,6 +15,24 @@
     }
 </style>
 
+<script>
+
+    function loadPlaylistsForUser(e) {
+        let username = e.target.textContent
+
+        xhttp=new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("playlists-details").innerHTML = this.responseText;
+            }
+        };
+
+        xhttp.open("GET", "playlists/" +username, true);
+        xhttp.send();
+    }
+
+</script>
+
 <div class="container" style="max-width: 100%">
     <div class="row">
         <div class="col-md-3">
@@ -26,9 +44,13 @@
 
             <ul class="list-group sidebar list-group-flush">
                 {{range $username := .}}
-                <li class="list-group-item">{{$username}}</li>
+                <li class="list-group-item" onclick="loadPlaylistsForUser(event)">{{$username}}</li>
                 {{end}}
             </ul>
+        </div>
+
+        <div class="col-md-9" id="playlists-details">
+
         </div>
     </div>
 </div>

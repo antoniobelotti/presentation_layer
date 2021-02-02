@@ -11,6 +11,7 @@ func setUpRoutes() *mux.Router {
 
 	r.HandleFunc("/greatest_hits/{period}", routes.GreatestHitsHandler)
 	r.HandleFunc("/playlists", routes.PlaylistsHandler)
+	r.HandleFunc("/playlists/{username}", routes.UserPlaylistsHandler)
 	r.HandleFunc("/", routes.IndexHandler)
 
 	return r
