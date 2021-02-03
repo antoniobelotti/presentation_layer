@@ -5,10 +5,12 @@
         overflow: scroll;
         overflow-x: hidden;
     }
+
     ::-webkit-scrollbar {
-        width: 0px;  /* Remove scrollbar space */
-        background: transparent;  /* Optional: just make scrollbar invisible */
+        width: 0px; /* Remove scrollbar space */
+        background: transparent; /* Optional: just make scrollbar invisible */
     }
+
     /* Optional: show position indicator in red */
     ::-webkit-scrollbar-thumb {
         background: #FF0000;
@@ -16,7 +18,6 @@
 
     .sidebar {
         position: static;
-        z-index: 10;
         width: auto;
         display: block;
         max-height: 80vh;
@@ -30,21 +31,22 @@
 
 
     .fixed_header tbody {
-        display:block;
-        height:80vh;
-        overflow:auto;
+        display: block;
+        height: 80vh;
+        overflow: auto;
     }
+
     .fixed_header thead, tbody tr, tfoot {
-        display:table;
-        width:100%;
-        table-layout:fixed;/* even columns width , fix width of table too*/
+        display: table;
+        width: 100%;
+        table-layout: fixed; /* even columns width , fix width of table too*/
     }
 </style>
 
 <script>
 
-    function removeAllChildren(element){
-        while(element.lastChild){
+    function removeAllChildren(element) {
+        while (element.lastChild) {
             element.removeChild(element.lastChild)
         }
     }
@@ -55,17 +57,17 @@
         spinner.hidden = false;
 
         fetch(new Request(`playlists/${username}/${playlistid}`))
-            .then(function(response) {
+            .then(function (response) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 spinner.hidden = true;
                 return response.json();
             })
-            .then(function(songs) {
+            .then(function (songs) {
                 console.log(songs)
                 let container = document.getElementById("playlists-songs").querySelector("tbody")
-                songs.forEach( (songInfo) => {
+                songs.forEach((songInfo) => {
                     let row = document.createElement("tr")
 
                     //let progressive = document.createElement("td")
@@ -77,7 +79,7 @@
                     let album = document.createElement("td")
                     album.textContent = songInfo["AlbumName"]
                     let duration = document.createElement("td")
-                    duration.textContent = (parseInt(songInfo["SongDuration"])/60).toFixed(2).replace(".", ":")
+                    duration.textContent = (parseInt(songInfo["SongDuration"]) / 60).toFixed(2).replace(".", ":")
 
                     let albumImage = document.createElement("td")
                     let img = document.createElement("img")
@@ -92,7 +94,7 @@
             });
     }
 
-    let previousActivePlaylist= null
+    let previousActivePlaylist = null
     let previousActiveUser = null;
 
     function loadPlaylistsForUser(e) {
@@ -107,14 +109,14 @@
         spinner.hidden = false;
 
         fetch(new Request(`playlists/${username}`))
-            .then((response)=>{
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 spinner.hidden = true;
                 return response.json();
             })
-            .then((playlists)=> {
+            .then((playlists) => {
                 let container = document.getElementById("user-playlists-basic-info").querySelector("tbody")
                 let songsContainer = document.getElementById("playlists-songs").querySelector("tbody")
                 removeAllChildren(container)
@@ -144,15 +146,47 @@
             })
     }
 
+    document.addEventListener("DOMContentLoaded", (event) => {
+        document.getElementById("user-searchbar").onchange = (ev) => {
+            const searchTerm = ev.target.value
+            const usernamesContainer = document.getElementById("username-container")
+            const usernames = usernamesContainer.childNodes
+            const progressBar = document.getElementById("search-progress")
+
+            usernamesContainer.hidden = true
+
+            progressBar.style.width = "0%"
+
+            usernames.forEach((element, index) => {
+                if (element.textContent.includes(searchTerm)) {
+                    element.hidden = false
+                } else {
+                    element.hidden = true
+                }
+                let percentageProgress = `${Math.trunc(usernames.length / index * 100)}%`
+                progressBar.style.width = percentageProgress
+                progressBar.textContent = percentageProgress
+            })
+
+            usernamesContainer.hidden = false
+            setTimeout(()=> progressBar.style.width = "0%", 1000)
+        }
+    })
+
 </script>
 
 <div class="container text-center" style="max-width: 100%">
     <div class="row">
         <div class="col-md-2">
             <div class="input-group flex-nowrap padded">
-                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
+                <input id="user-searchbar" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
             </div>
-            <ul class="list-group sidebar list-group-flush">
+
+            <div id="search-container" class="progress">
+                <div id="search-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <ul id="username-container" class="list-group sidebar list-group-flush">
                 {{range $username := .}}
                 <li class="list-group-item" onclick="loadPlaylistsForUser(event)">{{$username}}</li>
                 {{end}}
@@ -165,11 +199,11 @@
             </div>
             <table id="user-playlists-basic-info" class="table table-hover fixed_header">
                 <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Songs</th>
-                        <th scope="col">Duration</th>
-                    </tr>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Songs</th>
+                    <th scope="col">Duration</th>
+                </tr>
                 </thead>
                 <tbody>
 
