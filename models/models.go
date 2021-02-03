@@ -89,8 +89,7 @@ func GreatestHits(period string) ([]GreatestHitRow, error) {
 	return chart, nil
 }
 
-
-func GetAllUsernames() ([]string,error) {
+func GetAllUsernames() ([]string, error) {
 	sqlQuery := fmt.Sprintf("SELECT username FROM [dbo].[users];")
 	rows, err := db.Query(sqlQuery)
 	if err != nil {
@@ -114,13 +113,54 @@ func GetAllUsernames() ([]string,error) {
 		return nil, err
 	}
 
-	return usernames,nil
+	return usernames, nil
 }
 
-type Playlists struct {
-	Username string
+type PlaylistSong struct {
+	PlaylistId      int
+	SongProgressive int
+	SongName        string
+	ImageUrl        string
+	SongDuration    int
+	ArtistName      string
+	AlbumName       string
 }
 
-func GetPlaylistsByUsername(username string) (string, error){
-	return "ok",nil
+func GetPlaylistsByUsername(username string) ([]PlaylistSong, error) {
+	sqlQuery := fmt.Sprintf(`
+		SELECT playlist_id, position_inside_playlist, song_name, image_url, track_duration, artist_name, album_name
+		FROM dbo.playlist_songs
+		WHERE username_checksum = CHECKSUM(N'%s');`, username)
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var playlistsData []PlaylistSong
+
+	for rows.Next() {
+		var ps PlaylistSong
+
+		err := rows.Scan(
+			&ps.PlaylistId,
+			&ps.SongProgressive,
+			&ps.SongName,
+			&ps.ImageUrl,
+			&ps.SongDuration,
+			&ps.ArtistName,
+			&ps.AlbumName,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		playlistsData = append(playlistsData, ps)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return playlistsData, nil
 }
