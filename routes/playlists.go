@@ -17,11 +17,23 @@ func PlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, usernames)
 }
 
-func UserPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
+func UserPlaylistsBasicInfoHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 
-	playlists, err := models.GetPlaylistsByUsername(username)
+	playlists, err := models.GetPlaylistsBasicInfoByUsername(username)
+	if err != nil {
+		// return error page
+	}
+	json.NewEncoder(w).Encode(playlists)
+}
+
+func UserPlaylistSongsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+	playlistId := vars["playlistId"]
+
+	playlists, err := models.GetPlaylistsSongs(username, playlistId)
 	if err != nil {
 		// return error page
 	}

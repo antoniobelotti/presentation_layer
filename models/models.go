@@ -116,8 +116,48 @@ func GetAllUsernames() ([]string, error) {
 	return usernames, nil
 }
 
+type PlaylistBasicInfo struct {
+	PlaylistId       int
+	NumSongs         int
+	PlaylistDuration int
+}
+
+func GetPlaylistsBasicInfoByUsername(username string) ([]PlaylistBasicInfo, error) {
+	sqlQuery := fmt.Sprintf(`
+		SELECT playlist_id, num_tracks, playlist_duration
+		FROM dbo.playlists
+		WHERE username_checksum = CHECKSUM(N'%s');`, username)
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var playlists []PlaylistBasicInfo
+
+	for rows.Next() {
+		var pl PlaylistBasicInfo
+
+		err := rows.Scan(
+			&pl.PlaylistId,
+			&pl.NumSongs,
+			&pl.PlaylistDuration,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		playlists = append(playlists, pl)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return playlists, nil
+}
+
 type PlaylistSong struct {
-	PlaylistId      int
 	SongProgressive int
 	SongName        string
 	ImageUrl        string
@@ -126,11 +166,13 @@ type PlaylistSong struct {
 	AlbumName       string
 }
 
-func GetPlaylistsByUsername(username string) ([]PlaylistSong, error) {
+func GetPlaylistsSongs(username string, playlistId string) ([]PlaylistSong, error) {
 	sqlQuery := fmt.Sprintf(`
-		SELECT playlist_id, position_inside_playlist, song_name, image_url, track_duration, artist_name, album_name
+		SELECT position_inside_playlist, song_name, image_url, track_duration, artist_name, album_name
 		FROM dbo.playlist_songs
-		WHERE username_checksum = CHECKSUM(N'%s');`, username)
+		WHERE username_checksum = CHECKSUM(N'%s')
+		AND playlist_id = %s`, username, playlistId)
+
 	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
@@ -143,7 +185,6 @@ func GetPlaylistsByUsername(username string) ([]PlaylistSong, error) {
 		var ps PlaylistSong
 
 		err := rows.Scan(
-			&ps.PlaylistId,
 			&ps.SongProgressive,
 			&ps.SongName,
 			&ps.ImageUrl,
