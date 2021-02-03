@@ -1,33 +1,76 @@
 {{define "title"}}Playlists{{end}}
 {{define "body-content"}}
 <style>
+    html {
+        overflow: scroll;
+        overflow-x: hidden;
+    }
+    ::-webkit-scrollbar {
+        width: 0px;  /* Remove scrollbar space */
+        background: transparent;  /* Optional: just make scrollbar invisible */
+    }
+    /* Optional: show position indicator in red */
+    ::-webkit-scrollbar-thumb {
+        background: #FF0000;
+    }
+
     .sidebar {
         position: static;
         z-index: 10;
         width: auto;
         display: block;
-        max-height: 82vh;
+        max-height: 80vh;
         overflow-y: scroll;
     }
-    .padded{
-        padding-bottom: 5%;
-        padding-top: 5%;
+
+    .padded {
+        padding-bottom: 3%;
+        padding-top: 3%;
+    }
+
+    table {
+        display:block;
+        height : 85vh;
+        width: 100%;
+        overflow-y : scroll;
+        margin-top: 10%
     }
 </style>
 
 <script>
 
+    function loadFullPlaylistData(username, playlistid) {
+        alert(username + playlistid)
+    }
+
     function loadPlaylistsForUser(e) {
         let username = e.target.textContent
 
-        xhttp=new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
+        xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("playlists-details").innerHTML = this.responseText;
+                let playlists = JSON.parse(this.responseText)
+
+                let container = document.getElementById("user-playlists-basic-info").querySelector("tbody")
+
+                playlists.forEach((playlistInfo) => {
+                    let row = document.createElement("tr")
+                    row.onclick = () => loadFullPlaylistData(username, playlistInfo["PlaylistId"])
+
+                    let progressive = document.createElement("td")
+                    progressive.textContent = playlistInfo["PlaylistId"]
+                    let numSongs = document.createElement("td")
+                    numSongs.textContent = playlistInfo["NumSongs"]
+                    let duration = document.createElement("td")
+                    duration.textContent = Math.round(parseInt(playlistInfo["PlaylistDuration"]) / 60) + " min"
+
+                    row.append(progressive, numSongs, duration)
+                    container.appendChild(row)
+                })
             }
         };
 
-        xhttp.open("GET", "playlists/" +username, true);
+        xhttp.open("GET", "playlists/" + username, true);
         xhttp.send();
     }
 
@@ -49,8 +92,22 @@
             </ul>
         </div>
 
-        <div class="col-md-9" id="playlists-details">
+        <div class="col-md-3">
+            <table id="user-playlists-basic-info" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Songs</th>
+                        <th scope="col">Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
 
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-6" id="playlists-details">
         </div>
     </div>
 </div>

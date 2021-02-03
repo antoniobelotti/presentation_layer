@@ -126,7 +126,8 @@ func GetPlaylistsBasicInfoByUsername(username string) ([]PlaylistBasicInfo, erro
 	sqlQuery := fmt.Sprintf(`
 		SELECT playlist_id, num_tracks, playlist_duration
 		FROM dbo.playlists
-		WHERE username_checksum = CHECKSUM(N'%s');`, username)
+		WHERE username_checksum = CHECKSUM(N'%s')
+		ORDER BY num_tracks DESC;`, username)
 	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
