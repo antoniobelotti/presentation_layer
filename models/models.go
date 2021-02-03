@@ -172,7 +172,8 @@ func GetPlaylistsSongs(username string, playlistId string) ([]PlaylistSong, erro
 		SELECT position_inside_playlist, song_name, image_url, track_duration, artist_name, album_name
 		FROM dbo.playlist_songs
 		WHERE username_checksum = CHECKSUM(N'%s')
-		AND playlist_id = %s`, username, playlistId)
+		AND playlist_id = %s
+		ORDER BY position_inside_playlist ASC;`, username, playlistId)
 
 	rows, err := db.Query(sqlQuery)
 	if err != nil {

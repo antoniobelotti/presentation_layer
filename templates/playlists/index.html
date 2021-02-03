@@ -28,63 +28,130 @@
         padding-top: 3%;
     }
 
-    table {
+
+    .fixed_header tbody {
         display:block;
-        height : 85vh;
-        width: 100%;
-        overflow-y : scroll;
-        margin-top: 10%
+        height:80vh;
+        overflow:auto;
+    }
+    .fixed_header thead, tbody tr, tfoot {
+        display:table;
+        width:100%;
+        table-layout:fixed;/* even columns width , fix width of table too*/
     }
 </style>
 
 <script>
 
-    function loadFullPlaylistData(username, playlistid) {
-        alert(username + playlistid)
+    function removeAllChildren(element){
+        while(element.lastChild){
+            element.removeChild(element.lastChild)
+        }
     }
 
+    function loadFullPlaylistData(username, playlistid) {
+
+        let spinner = document.getElementById("spinner-songs-info")
+        spinner.hidden = false;
+
+        fetch(new Request(`playlists/${username}/${playlistid}`))
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                spinner.hidden = true;
+                return response.json();
+            })
+            .then(function(songs) {
+                console.log(songs)
+                let container = document.getElementById("playlists-songs").querySelector("tbody")
+                songs.forEach( (songInfo) => {
+                    let row = document.createElement("tr")
+
+                    //let progressive = document.createElement("td")
+                    //progressive.textContent = songInfo["SongProgressive"]
+                    let songName = document.createElement("td")
+                    songName.textContent = songInfo["SongName"]
+                    let artistName = document.createElement("td")
+                    artistName.textContent = songInfo["ArtistName"]
+                    let album = document.createElement("td")
+                    album.textContent = songInfo["AlbumName"]
+                    let duration = document.createElement("td")
+                    duration.textContent = (parseInt(songInfo["SongDuration"])/60).toFixed(2).replace(".", ":")
+
+                    let albumImage = document.createElement("td")
+                    let img = document.createElement("img")
+                    img.src = songInfo["ImageUrl"]
+                    img.width = 60;
+                    img.height = 60;
+                    albumImage.append(img)
+
+                    row.append(songName, artistName, album, duration, albumImage)
+                    container.append(row)
+                })
+            });
+    }
+
+    let previousActivePlaylist= null
+    let previousActiveUser = null;
+
     function loadPlaylistsForUser(e) {
+        if (previousActiveUser)
+            previousActiveUser.classList.remove("active")
+
+        e.target.classList.add("active")
+        previousActiveUser = e.target
+
         let username = e.target.textContent
+        let spinner = document.getElementById("spinner-basic-info")
+        spinner.hidden = false;
 
-        xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                let playlists = JSON.parse(this.responseText)
-
+        fetch(new Request(`playlists/${username}`))
+            .then((response)=>{
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                spinner.hidden = true;
+                return response.json();
+            })
+            .then((playlists)=> {
                 let container = document.getElementById("user-playlists-basic-info").querySelector("tbody")
-
+                let songsContainer = document.getElementById("playlists-songs").querySelector("tbody")
+                removeAllChildren(container)
+                removeAllChildren(songsContainer)
                 playlists.forEach((playlistInfo) => {
                     let row = document.createElement("tr")
-                    row.onclick = () => loadFullPlaylistData(username, playlistInfo["PlaylistId"])
+                    row.onclick = () => {
+                        if (previousActivePlaylist)
+                            previousActivePlaylist.classList.remove("table-active")
+
+                        row.classList.add("table-active")
+                        previousActivePlaylist = row
+
+                        loadFullPlaylistData(username, playlistInfo["PlaylistId"])
+                    }
 
                     let progressive = document.createElement("td")
                     progressive.textContent = playlistInfo["PlaylistId"]
                     let numSongs = document.createElement("td")
                     numSongs.textContent = playlistInfo["NumSongs"]
                     let duration = document.createElement("td")
-                    duration.textContent = Math.round(parseInt(playlistInfo["PlaylistDuration"]) / 60) + " min"
+                    duration.textContent = (parseInt(playlistInfo["PlaylistDuration"]) / 60).toFixed(2).replace(".", ":")
 
                     row.append(progressive, numSongs, duration)
                     container.appendChild(row)
                 })
-            }
-        };
-
-        xhttp.open("GET", "playlists/" + username, true);
-        xhttp.send();
+            })
     }
 
 </script>
 
-<div class="container" style="max-width: 100%">
+<div class="container text-center" style="max-width: 100%">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="input-group flex-nowrap padded">
-                <span class="input-group-text" id="addon-wrapping">@</span>
                 <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
             </div>
-
             <ul class="list-group sidebar list-group-flush">
                 {{range $username := .}}
                 <li class="list-group-item" onclick="loadPlaylistsForUser(event)">{{$username}}</li>
@@ -93,7 +160,10 @@
         </div>
 
         <div class="col-md-3">
-            <table id="user-playlists-basic-info" class="table table-hover">
+            <div id="spinner-basic-info" class="spinner-border m-5" role="status" style="position: fixed; top: 50%; left: 25%; z-index: 20;" hidden>
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <table id="user-playlists-basic-info" class="table table-hover fixed_header">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -107,7 +177,25 @@
             </table>
         </div>
 
-        <div class="col-md-6" id="playlists-details">
+        <div class="col-md-7" id="playlists-details">
+            <div id="spinner-songs-info" class="spinner-border m-5" role="status" style="position: fixed; top: 50%; left: 60%; z-index: 20;" hidden>
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <table id="playlists-songs" class="table table-striped fixed_header">
+                <thead>
+                <tr>
+                    <!-- <th scope="col">#</th>  it takes to much space -->
+                    <th scope="col">Song</th>
+                    <th scope="col">Artist</th>
+                    <th scope="col">Album</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col"><!-- album image --> </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
