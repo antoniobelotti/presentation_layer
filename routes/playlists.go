@@ -13,7 +13,7 @@ func PlaylistsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// return error page
 	}
-	t := template.Must(template.ParseFiles("templates/base.html", "templates/playlists/index.html"))
+	t := template.Must(template.ParseFiles("templates/base.html", "templates/playlists.html"))
 	t.Execute(w, usernames)
 }
 

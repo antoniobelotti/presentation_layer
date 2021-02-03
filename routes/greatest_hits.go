@@ -23,6 +23,6 @@ func GreatestHitsHandler(w http.ResponseWriter, r *http.Request) {
 			return i + 1
 		},
 	}
-	t := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles("templates/base.html", "templates/greatest_hits/index.html"))
+	t := template.Must(template.New("base.html").Funcs(funcMap).ParseFiles("templates/base.html", "templates/greatest_hits.html"))
 	t.Execute(w, rows)
 }
