@@ -224,8 +224,8 @@ func GetGeneralStats() (*GeneralStats, error) {
 	var stats GeneralStats
 	for rows.Next() {
 		err := rows.Scan(&stats.NumUsers)
-		if err!=nil{
-			return nil,err
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -237,10 +237,39 @@ func GetGeneralStats() (*GeneralStats, error) {
 	defer rows2.Close()
 	for rows2.Next() {
 		err := rows2.Scan(&stats.NumPlaylists)
-		if err!=nil{
-			return nil,err
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	return &stats, nil
+}
+
+type PlaylistsCountByLength struct {
+	PlaylistLength int
+	NumPlaylists   int
+}
+
+func GetPlaylistLengthDistribution() ([]PlaylistsCountByLength, error) {
+	sqlQuery := `SELECT len_playlist,num_playlist FROM dbo.number_of_playlists_by_length_distribution;`
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var distribution []PlaylistsCountByLength
+	for rows.Next() {
+		var entry PlaylistsCountByLength
+		err := rows.Scan(&entry.PlaylistLength, &entry.NumPlaylists)
+		if err != nil {
+			return nil, err
+		}
+
+		distribution = append(distribution, entry)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return distribution, nil
 }
