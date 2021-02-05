@@ -273,3 +273,32 @@ func GetPlaylistLengthDistribution() ([]PlaylistsCountByLength, error) {
 	}
 	return distribution, nil
 }
+
+type PlaylistsCountForUser struct {
+	NumberOfPlaylists int
+	NumberOfUsers     int
+}
+
+func GetPlaylistsByUserDistribution() ([]PlaylistsCountForUser, error) {
+	sqlQuery := `SELECT number_of_playlists, number_of_users FROM dbo.number_of_playlists_per_user_distribution;`
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var distribution []PlaylistsCountForUser
+	for rows.Next() {
+		var entry PlaylistsCountForUser
+		err := rows.Scan(&entry.NumberOfPlaylists, &entry.NumberOfUsers)
+		if err != nil {
+			return nil, err
+		}
+
+		distribution = append(distribution, entry)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return distribution, nil
+}

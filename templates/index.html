@@ -63,6 +63,21 @@
                 const y = distribution.map((x) => x["NumPlaylists"])
                 buildBarChart(canvasId, x,y, "length(seconds)", "#playlists", "Playlists Length Distribution")
             })
+
+        fetch(new Request("/stats/num-playlists-per-user-distribution"))
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((distribution) => {
+                console.log(distribution)
+                const canvasId = "num-playlists-per-user-distribution-canvas"
+                const x = distribution.map((x) => x["NumberOfPlaylists"])
+                const y = distribution.map((x) => x["NumberOfUsers"])
+                buildBarChart(canvasId, x,y, "#playlists", "#users", "Playlists Per User Distribution")
+            })
     })
 </script>
 
@@ -80,7 +95,7 @@
             <canvas id="playlists-length-distribution-canvas"></canvas>
         </div>
         <div class="col-md-6">
-            <canvas id="playlists-length-distribution-canvas"></canvas>
+            <canvas id="num-playlists-per-user-distribution-canvas"></canvas>
         </div>
     </div>
 </div>
