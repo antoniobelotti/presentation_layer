@@ -8,6 +8,46 @@
     Chart.defaults.global.elements.rectangle.backgroundColor = 'rgba(76,82,112)'
     //Chart.defaults.global.elements.rectangle.borderColor = 'rgba(188,236,224)'
 
+    function buildBarChart(canvasId, x, y, xLabel, yLabel, title){
+        const ctx = document.getElementById(canvasId).getContext("2d")
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: x,
+                datasets: [{
+                    data: y,
+                    barThickness:"4"
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: yLabel
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: xLabel
+                        },
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: title
+                }
+            }
+        });
+    }
 
     document.addEventListener("DOMContentLoaded", (event) => {
         fetch(new Request("/stats/playlists-length-distribution"))
@@ -18,44 +58,10 @@
                 return response.json();
             })
             .then((distribution) => {
-                const ctx = document.getElementById("playlists-length-distribution-canvas").getContext("2d")
-                const myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: distribution.map((x) => x["PlaylistLength"]),
-                        datasets: [{
-                            data: distribution.map((x) => x["NumPlaylists"]),
-                            barThickness:"4"
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: "# playlists"
-                                },
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }],
-                            xAxes: [{
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: "length (seconds)"
-                                },
-                            }]
-                        },
-                        responsive: true,
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Playlists Length Distribution'
-                        }
-                    }
-                });
+                const canvasId = "playlists-length-distribution-canvas"
+                const x = distribution.map((x) => x["PlaylistLength"])
+                const y = distribution.map((x) => x["NumPlaylists"])
+                buildBarChart(canvasId, x,y, "length(seconds)", "#playlists", "Playlists Length Distribution")
             })
     })
 </script>
