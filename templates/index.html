@@ -49,14 +49,16 @@
         });
     }
 
+    function parseJSONResponse(response){
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    }
+
     document.addEventListener("DOMContentLoaded", (event) => {
         fetch(new Request("/stats/playlists-length-distribution"))
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(parseJSONResponse)
             .then((distribution) => {
                 const canvasId = "playlists-length-distribution-canvas"
                 const x = distribution.map((x) => x["PlaylistLength"])
@@ -65,14 +67,8 @@
             })
 
         fetch(new Request("/stats/num-playlists-per-user-distribution"))
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(parseJSONResponse)
             .then((distribution) => {
-                console.log(distribution)
                 const canvasId = "num-playlists-per-user-distribution-canvas"
                 const x = distribution.map((x) => x["NumberOfPlaylists"])
                 const y = distribution.map((x) => x["NumberOfUsers"])
