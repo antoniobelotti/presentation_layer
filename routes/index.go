@@ -1,24 +1,19 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
+	"web/main/models"
 )
 
-type IndexData struct {
-	Title string
-	Message string
-}
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	/*
-		vars := mux.Vars(r)
-		title := vars["title"]
-		page := vars["page"] */
+	stats,err := models.GetGeneralStats()
+	if err!= nil{
+		fmt.Println(err)
+	}
 
-	t := template.Must(template.ParseFiles("templates/base.html"))
-	t.Execute(w, IndexData{
-		Title: "example - Index",
-		Message: "Hello World",
-	})
+	t := template.Must(template.ParseFiles("templates/base.html", "templates/index.html"))
+	t.Execute(w, stats)
 }

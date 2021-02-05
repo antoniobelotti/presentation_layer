@@ -207,3 +207,40 @@ func GetPlaylistsSongs(username string, playlistId string) ([]PlaylistSong, erro
 
 	return playlistsData, nil
 }
+
+type GeneralStats struct {
+	NumUsers     int
+	NumPlaylists int
+}
+
+func GetGeneralStats() (*GeneralStats, error) {
+	sqlQuery := `SELECT COUNT(*) FROM dbo.users;`
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats GeneralStats
+	for rows.Next() {
+		err := rows.Scan(&stats.NumUsers)
+		if err!=nil{
+			return nil,err
+		}
+	}
+
+	sqlQuery2 := `SELECT COUNT(*) FROM dbo.playlists;`
+	rows2, err := db.Query(sqlQuery2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows2.Close()
+	for rows2.Next() {
+		err := rows2.Scan(&stats.NumPlaylists)
+		if err!=nil{
+			return nil,err
+		}
+	}
+
+	return &stats, nil
+}

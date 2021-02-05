@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{{define "title"}}Index{{end}}
+{{define "body-content"}}
+
+<div class="container-md">
+    <h1>{{.NumUsers}} users</h1>
+    <h1>{{.NumPlaylists}} playlists</h1>
+</div>
+
+{{end}}
