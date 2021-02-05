@@ -65,8 +65,8 @@
                 return response.json();
             })
             .then(function (songs) {
-                console.log(songs)
                 let container = document.getElementById("playlists-songs").querySelector("tbody")
+                removeAllChildren(container)
                 songs.forEach((songInfo) => {
                     let row = document.createElement("tr")
 
