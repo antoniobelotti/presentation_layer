@@ -36,3 +36,13 @@ func StatsNumPlaylistsPerUserDistribution(w http.ResponseWriter, r *http.Request
 
 	json.NewEncoder(w).Encode(distribution)
 }
+
+
+func StatsNumTracksPerPlaylistDistribution(w http.ResponseWriter, r *http.Request) {
+	distribution,err := models.GetNumberOfTracksPerPlaylistDistribution()
+	if err!= nil{
+		fmt.Println(err)
+	}
+
+	json.NewEncoder(w).Encode(distribution)
+}

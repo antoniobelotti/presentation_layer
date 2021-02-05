@@ -74,24 +74,38 @@
                 const y = distribution.map((x) => x["NumberOfUsers"])
                 buildBarChart(canvasId, x,y, "#playlists", "#users", "Playlists Per User Distribution")
             })
+
+        fetch(new Request("/stats/num-tracks-per-playlists-distribution"))
+            .then(parseJSONResponse)
+            .then((distribution) => {
+                const canvasId = "num-tracks-per-playlists-distribution-canvas"
+                const x = distribution.map((x) => x["NumberOfTracks"])
+                const y = distribution.map((x) => x["NumberOfPlaylists"])
+                buildBarChart(canvasId, x,y, "#tracks", "#playlists", "Tracks Per Playlist Distribution")
+            })
+
+        let nplaylists = document.getElementById("num-playlists")
+        let nusers  = document.getElementById("num-users")
+        nplaylists.textContent = parseInt(nplaylists.textContent).toLocaleString() + " playlists"
+        nusers.textContent = parseInt(nusers.textContent).toLocaleString() + " users"
+
     })
 </script>
 
 <div class="container-md" style="max-width: 100%">
     <div class="row">
-        <div class="col-md-6">
-            <h1>{{.NumUsers}} users</h1>
+        <div class="col-md-6" style="padding-left: 5%">
+            <h1 id="num-users">{{.NumUsers}} users</h1>
+            <h1 id="num-playlists">{{.NumPlaylists}} playlists</h1>
         </div>
-        <div class="col-md-6">
-            <h1>{{.NumPlaylists}} playlists</h1>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-md-6">
             <canvas id="playlists-length-distribution-canvas"></canvas>
         </div>
         <div class="col-md-6">
             <canvas id="num-playlists-per-user-distribution-canvas"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="num-tracks-per-playlists-distribution-canvas"></canvas>
         </div>
     </div>
 </div>

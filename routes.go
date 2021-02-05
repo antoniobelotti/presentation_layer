@@ -15,6 +15,7 @@ func setUpRoutes() *mux.Router {
 	r.HandleFunc("/playlists/{username}/{playlistId}", routes.UserPlaylistSongsHandler)
 	r.HandleFunc("/stats/playlists-length-distribution", routes.StatsPlaylistsLengthDistribution)
 	r.HandleFunc("/stats/num-playlists-per-user-distribution", routes.StatsNumPlaylistsPerUserDistribution)
+	r.HandleFunc("/stats/num-tracks-per-playlists-distribution", routes.StatsNumTracksPerPlaylistDistribution)
 	r.HandleFunc("/", routes.IndexHandler)
 
 	return r
