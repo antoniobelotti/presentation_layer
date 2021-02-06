@@ -6,6 +6,7 @@ import (
 	"fmt"
 	_ "github.com/denisenkom/go-mssqldb"
 	"log"
+	"math"
 	"os"
 )
 
@@ -209,8 +210,11 @@ func GetPlaylistsSongs(username string, playlistId string) ([]PlaylistSong, erro
 }
 
 type GeneralStats struct {
-	NumUsers     int
-	NumPlaylists int
+	NumUsers             int
+	NumPlaylists         int
+	AvgTracksPerPlaylist float64
+	AvgPlaylistsPerUser  float64
+	AvgPlaylistLength    float64
 }
 
 func GetGeneralStats() (*GeneralStats, error) {
@@ -242,6 +246,22 @@ func GetGeneralStats() (*GeneralStats, error) {
 		}
 	}
 
+	sqlQuery3 := `SELECT avg_tracks_for_playlist, avg_playlists_per_user, avg_playlist_len FROM dbo.basic_stats;`
+	rows3, err := db.Query(sqlQuery3)
+	if err != nil {
+		return nil, err
+	}
+	defer rows3.Close()
+	for rows3.Next() {
+		err := rows3.Scan(&stats.AvgTracksPerPlaylist, &stats.AvgPlaylistsPerUser, &stats.AvgPlaylistLength)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	stats.AvgPlaylistLength = math.Round(stats.AvgPlaylistLength*100)/100
+	stats.AvgPlaylistsPerUser = math.Round(stats.AvgPlaylistsPerUser*100)/100
+	stats.AvgTracksPerPlaylist = math.Round(stats.AvgTracksPerPlaylist*100)/100
 	return &stats, nil
 }
 
@@ -303,10 +323,9 @@ func GetPlaylistsByUserDistribution() ([]PlaylistsCountForUser, error) {
 	return distribution, nil
 }
 
-
 type NumberOfTracksPerPlaylist struct {
-	NumberOfTracks int
-	NumberOfPlaylists     int
+	NumberOfTracks    int
+	NumberOfPlaylists int
 }
 
 func GetNumberOfTracksPerPlaylistDistribution() ([]NumberOfTracksPerPlaylist, error) {

@@ -94,9 +94,13 @@
 
 <div class="container-md" style="max-width: 100%">
     <div class="row">
-        <div class="col-md-6" style="padding-left: 5%">
-            <h1 id="num-users">{{.NumUsers}} users</h1>
-            <h1 id="num-playlists">{{.NumPlaylists}} playlists</h1>
+        <div class="col-md-6" style="padding-left: 5%; padding-top: 5%">
+            <h2 id="num-users">{{.NumUsers}} users</h2>
+            <h2 id="num-playlists">{{.NumPlaylists}} playlists</h2>
+            <hr>
+            <h3> {{.AvgPlaylistsPerUser}} average playlist per user </h3>
+            <h3> {{.AvgTracksPerPlaylist}} average tracks per playlist</h3>
+            <h3> {{.AvgPlaylistLength}} average playlist length</h3>
         </div>
         <div class="col-md-6">
             <canvas id="playlists-length-distribution-canvas"></canvas>
