@@ -14,8 +14,8 @@ var db *sql.DB
 
 var server = "afbd.database.windows.net"
 var port = 1433
-var user = "antonio.belotti"
-var password = os.Getenv("AZUREDB_PWD")
+var user = "presentation_web_app_login"
+var password = os.Getenv("DB_PWD")
 var database = "lastfm"
 
 func InitDB() error {
@@ -32,12 +32,9 @@ func InitDB() error {
 }
 
 type GreatestHitRow struct {
-	AlbumMBID        string
 	AlbumName        string
-	ArtistMBID       string
 	ArtistName       string
 	ImageURL         string
-	SongMDIB         string
 	SongName         string
 	TimesListened    int
 	TrackDurationSec int
@@ -54,7 +51,10 @@ func GreatestHits(period string) ([]GreatestHitRow, error) {
 		dbTable = "last_month_gh"
 	}
 
-	sqlQuery := fmt.Sprintf("SELECT * FROM dbo.%s ORDER BY times_listened DESC", dbTable)
+	sqlQuery := fmt.Sprintf(`
+		SELECT album_name, artist_name, image_url, name, times_listened, track_duration
+		FROM dbo.%s 
+		ORDER BY times_listened DESC;`, dbTable)
 	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
@@ -67,12 +67,9 @@ func GreatestHits(period string) ([]GreatestHitRow, error) {
 		var song GreatestHitRow
 
 		err := rows.Scan(
-			&song.AlbumMBID,
 			&song.AlbumName,
-			&song.ArtistMBID,
 			&song.ArtistName,
 			&song.ImageURL,
-			&song.SongMDIB,
 			&song.SongName,
 			&song.TimesListened,
 			&song.TrackDurationSec)
